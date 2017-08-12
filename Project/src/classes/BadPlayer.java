@@ -1,20 +1,27 @@
+package classes;
+
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class BadPlayer extends Player{
+public class BadPlayer extends Player
+{
 
-	public BadPlayer(Card[] cards){this.hand = new ArrayList<Card>(Arrays.asList(cards));}
+    public BadPlayer()
+    {
+        super();
+    }
+    
+	public BadPlayer(Card[] cards)
+    {
+        super(cards);
+    }
  
-  /* play a card */ 
-	public boolean play(DiscardPile       discardPile, 
-	                    Stack<Card>       drawPile, 
-											ArrayList<Player> players)
+    /* play a card */ 
+    @Override
+	public boolean play(DiscardPile discardPile, CardPile drawPile, Player[] players)
 	{
 		discardPile.add(this.hand.remove(0));
-		if( this.hand.size() == 0 ){return true;}
-		return false;
+		return this.hand.size() == 0;
 	}
-	
-	
 }
