@@ -1,4 +1,9 @@
 /Project/nbproject/
 /Project/build/
-/Project/dist/**
 /Project/test/
+/Project/dist/web-files/
+/Project/dist/run*/
+/Project/dist/*.html
+
+*.class
+*.jnlp
