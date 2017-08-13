@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Crazy 8</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="jQuery.js" ></script>
+        <script>
+            $(function(){
+                makeCards(app.getPlayers());
+                makePiles(app.getStatus());
+                //$("#update").on("click", function(){
+                //    const isRunning = app.update();
+                //    makeCards(app.getPlayers());
+                //    makePiles(app.getStatus());
+                //});
+            });
+            
+            function makePiles(cardJson){
+                const json = JSON.parse(cardJson);
+                $("#discardpile").html("")
+                    .append("<h2>Discard pile</h2>")
+                    .append("<img src='../images/" + 
+                    json.discard.image + "' class='pileimage'/>");
+                $("#deck").html("")
+                    .append("<h2>Card pile</h2>")
+                    .append("<img src='../images/" + 
+                    json.deck.image + "' class='pileimage' />");
+            }
+            
+            function makeCards(cardJson){
+                const json = JSON.parse(cardJson);
+                let i = 1;
+                json.players.forEach(function(player) {
+                    const playerdiv = $("#player" + i);
+                    if (player.isleader)
+                    {
+                        playerdiv.addClass("leader");
+                    }
+                    if (player.iscurrent)
+                    {
+                        playerdiv.addClass("current");
+                    }
+                    let angle = 25;
+                    let translate1 = 12.0;
+                    let translate2 = 1.0;
+                    let j = 0;
+                    playerdiv.find(".handcontainer").html("");
+                    player.cards.forEach(function(card) {
+                        playerdiv.find(".handcontainer")
+                            .append("<li><img src='../images/" + 
+                            card.image + "' class='cardimage' style='transform:rotate(" + 
+                            angle + "deg) translate("+translate1+"em, "+translate2+"em)' /></li>");
+                        angle -= 50 / (player.cards.length - 1);
+                        translate1 -= 24.0 / (player.cards.length - 1);
+                        if (j < (player.cards.length - 1) / 2)
+                        {
+                            translate2 += 5.0 / (player.cards.length - 1);
+                        }
+                        else
+                        {
+                            translate2 -= 5.0 / (player.cards.length - 1);
+                        }
+                        j++;
+                    });
+                    i++;
+                });
+            }
+        </script>
+        <style>
+            h2 {
+                padding-top: 60px;
+                color: white;
+            }
+            
+            #gameboard{
+                background-color: #45a173;
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                right: 20%;
+            }
+            
+            #console{
+                background-color: white;
+                position: absolute;
+                box-shadow: 0px 0px 5px #243119;
+                left: 80%;
+                top: 0;
+                bottom: 0;
+                right: 0;
+            }
+            
+            .playerhand {
+                height: 275px;
+                border: #243119 solid 1px;
+                width: 600px;
+                background-color: #96BE8C;
+                box-shadow: 0px 0px 5px #243119;
+                z-index: 2;
+            }
+
+            .handcontainer{
+                list-style-type: none;
+                padding: 0;
+                margin: 0 0 1.5em 0;
+                position: relative;
+            }
+
+            .cardimage {
+                display: block;
+                position: absolute;
+                left: 45%; 
+                width: 8em; 
+                margin: -2em;
+            }
+            
+            .pileimage {
+                display: block;
+                width: 8em; 
+                margin: auto;
+            }
+            
+            #player1 {
+                position:  absolute;
+                bottom: 0;
+                left: calc(50% - 300px);
+            }
+
+            #player2 {
+                position: absolute;
+                top: 0;
+                left: calc(50% - 300px);
+                transform: rotate(180deg);
+            }
+
+            #player3 {
+                position: absolute;
+                left: -160px;
+                top: calc(50% - 130px);
+                transform: rotate(90deg);
+            }
+
+            #player4 {
+                position: absolute;
+                right: -160px;
+                top: calc(50% - 130px);
+                transform: rotate(-90deg);
+            }
+            
+            #gamepiles {
+                height:  50%;
+                width:  50%;
+                position: absolute;
+                background-color: #433A3F;
+                top: calc(50% - 25%);
+                left: calc(50% - 25%);
+                border: #3D5A6C solid 2px;
+                display: flex;
+            }
+            
+            @-webkit-keyframes blinker {
+                0% 
+                { 
+                    box-shadow: 0px 0px 5px #243119;
+                }
+                50% 
+                { 
+                    box-shadow: 0px 0px 35px yellow; 
+                }
+                100% 
+                { 
+                    box-shadow: 0px 0px 5px #243119;
+                }
+            }
+
+            .current {
+                -webkit-animation-name: blinker;
+                -webkit-animation-iteration-count: infinite;
+                -webkit-animation-timing-function: cubic-bezier(.5, 0, 1, 1);
+                -webkit-animation-duration: 2.2s;
+            }
+            
+            .leader .burst-12{
+                display: block;
+            }
+            
+            .burst-12 {
+                height: 30px;
+                width: 30px;
+                background: #2BC016;
+                position: absolute;
+                text-align: center;
+                display: none;
+            }
+            
+            .burst-12:before, .burst-12:after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 30px;
+                width: 30px;
+                background: #2BC016;
+            }
+            .burst-12:before {
+                -webkit-transform: rotate(30deg);
+                   -moz-transform: rotate(30deg);
+                    -ms-transform: rotate(30deg);
+                     -o-transform: rotate(30deg);
+            }
+            .burst-12:after {
+                -webkit-transform: rotate(60deg);
+                   -moz-transform: rotate(60deg);
+                    -ms-transform: rotate(60deg);
+                     -o-transform: rotate(60deg);
+            }
+            
+            .btn {
+                font-family: Arial;
+                color: #ffffff;
+                font-size: 20px;
+                background: #395E66;
+                padding: 10px 20px 10px 20px;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .btn:hover {
+                background: #3cb0fd;
+                text-decoration: none;
+            }
+            
+            .commands {
+                height: 50px;
+                text-align: center;
+                padding-top: 30px;
+            }
+
+            #consolecontainer {
+                height: calc(100% - 80px);
+            }
+
+            #consolearea {
+                height: 100%;
+                width: 98%;
+            }
+            
+            #discardpile, #deck {
+                width: 50%;
+                height: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="gameboard">
+            <div id="player1" class="playerhand">
+                <div class="burst-12"></div>
+                <ul class="handcontainer">
+                    
+                </ul>
+            </div>
+            <div id="player2" class="playerhand">
+                <div class="burst-12"></div>
+                <ul class="handcontainer">
+                    
+                </ul>
+            </div>
+            <div id="gamepiles">
+                <div id="discardpile">
+                    
+                </div>
+                <div id="deck">
+                    
+                </div>
+            </div>
+            <div id="player3" class="playerhand">
+                <div class="burst-12"></div>
+                <ul class="handcontainer">
+                    
+                </ul>
+            </div>
+            <div id="player4" class="playerhand">
+                <div class="burst-12"></div>
+                <ul class="handcontainer">
+                    
+                </ul>
+            </div>
+        </div>
+        <div id="console">
+            <div id="consolecontainer">
+                <textarea readonly="readonly" id="consolearea" ></textarea>
+            </div>
+            <div class="commands">
+                <a href="#" id="update" class="btn">Play</a>
+                <a href="#" class="btn" onclick="app.exit()">Exit the Application</a>
+            </div>
+        </div>
+    </body>
+</html>

@@ -71,6 +71,15 @@ public abstract class Player
 	}
     
     /**
+     * Get the current player's hand
+     * @return The player's hand.
+     */
+    public Hand getHand()
+    {
+        return hand;
+    }
+    
+    /**
      * Checks if the requested card is a valid move in the context of the given
      * discard pile.
      * @param discardPile The discard pile to use for our check.

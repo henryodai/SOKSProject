@@ -243,4 +243,13 @@ public class GameModel
     {
         return players[currentPlayerIndex];
     }
+    
+    /**
+     * Get the list of all current players.
+     * @return Array of players.
+     */
+    public Player[] getPlayers()
+    {
+        return players;
+    }
 }
