@@ -10,6 +10,7 @@ and open the template in the editor.
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script type="text/javascript" src="jQuery.js" ></script>
+        <script type='text/JavaScript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
         <script>
             var isrunning = true;
             
@@ -37,6 +38,8 @@ and open the template in the editor.
                 //Allow game's restart
                 $("#modalform").show();
                 $(".modaloverlay").show();
+                $("#consolearea").val($("#consolearea").val() + "\n" + 
+                        "--------------------------------------------");
             }
             
             function update()
@@ -45,8 +48,10 @@ and open the template in the editor.
                 {
                     return;
                 }
+                let JsonStatus = app.getStatus();
+                const initialstatus = JSON.parse(JsonStatus);
                 isrunning = app.update();
-                const JsonStatus = app.getStatus();
+                JsonStatus = app.getStatus();
                 const status = JSON.parse(JsonStatus);
                 //get the current player
                 const currentPlayer = $(".current");
@@ -74,7 +79,7 @@ and open the template in the editor.
                         "left" : discard.left
                     }, 600, function(){
                         makeCards(app.getPlayers());
-                        makePiles(JsonStatus);
+                        makePiles(app.getStatus());
                         $(card).remove();
                     });
                 }
@@ -83,26 +88,28 @@ and open the template in the editor.
                         status.deck.suit).length === 0)
                 {
                     //Get the played card
-                    const card = $("#"+ status.deck.rank + "_of_" + status.deck.suit);
+                    const card = $("#"+ initialstatus.deck.rank + "_of_" + initialstatus.deck.suit);
                     //Log the action
                     $("#consolearea").val($("#consolearea").val() + "\n" + 
                             currentPlayer.attr("id") + " drew the " + 
-                            status.discard.rank + " of " + status.discard.suit);
+                            initialstatus.deck.rank + " of " + initialstatus.deck.suit);
                     //Animate the card
                     const hand = currentPlayer.offset();
                     const offset = card.offset();
+                    console.log(hand);
+                    console.log(offset);
                     card.css({
                         "transform" : "none",
                         "position": "fixed",
-                        "top" : card.top,
-                        "left" : card.left,
+                        "top" : offset.top,
+                        "left" : offset.left,
                         "z-index" : "3"
-                    }).appendTo($("body")).animate({
-                        "top" : currentPlayer.top + currentPlayer.height() / 2,
-                        "left" : currentPlayer.left + currentPlayer.width() / 2
+                    }).animate({
+                        "top" : hand.top + currentPlayer.height() / 2,
+                        "left" : hand.left + currentPlayer.width() / 2
                     }, 600, function(){
                         makeCards(app.getPlayers());
-                        makePiles(JsonStatus);
+                        makePiles(app.getStatus());
                         $(card).remove();
                     });
                 }
@@ -117,6 +124,11 @@ and open the template in the editor.
                     //set final values
                     makeCards(app.getPlayers());
                     makePiles(JsonStatus);
+                }
+                var psconsole = "#consolearea";
+                if(psconsole.length)
+                {
+                   psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
                 }
             }
             

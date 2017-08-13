@@ -1,12 +1,5 @@
 package classes;
 
-import classes.BadPlayer;
-import classes.Card;
-import classes.CardPile;
-import classes.DiscardPile;
-import classes.Pile;
-import classes.Player;
-import classes.Setup;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +28,8 @@ public class GameModel
      */
     public final static Class[] PLAYER_TYPES =
     {
-        BadPlayer.class
+        BadPlayer.class,
+        ExtraCards.class
     };
     
     /**

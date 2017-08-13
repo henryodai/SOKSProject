@@ -4,6 +4,7 @@
 /Project/dist/web-files/
 /Project/dist/run*/
 /Project/dist/*.html
+/Project/*.xml
 
 *.class
 *.jnlp

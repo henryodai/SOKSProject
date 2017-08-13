@@ -115,6 +115,31 @@ public abstract class Player
         //public boolean lambda(Card card) {something}
         return hand.list().stream().anyMatch((card) -> (isMoveValid(discardPile, card)));
     }
+    
+    /**
+     * Get the next player in the given players array, it makes sure to 
+     * take in next player accoring to the game order, so if this is the last
+     * in the array, it will return the first.
+     * @param players The players array to search in.
+     * @return the instance of the next player.
+     */
+    protected Player getNextPlayer(Player[] players)
+    {
+        int i;
+        //Search for self in the players array
+        for (i = 0; i < players.length; i++)
+        {
+            //If we found ourselves
+            if (players[i].equals(this))
+            {
+                //quit the loop
+                break;
+            }
+        }
+        //Check if we are the last player in the array, if yes, return index 0, 
+        //if not, return next.
+        return i == players.length- 1 ? players[0] : players[i + 1];
+    }
 	
 	/**
      * The abstract play method of the player, should be redefined to implement

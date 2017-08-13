@@ -104,4 +104,14 @@ public class Hand
     {
         return hand.size();
     }
+    
+    /**
+     * Check if the hand contains a power car (an eigth)
+     * @return Return true if the hand does contain a power card, false otherwise.
+     */
+    public boolean ContainsPowerCard()
+    {
+        //Check using a lambda if any card in the array contains an eight.
+        return hand.stream().anyMatch((card) -> (card.rank.equals("8")));
+    }
 }
