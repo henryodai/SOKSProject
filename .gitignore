@@ -1,3 +1,4 @@
-/Project/nbproject/private/
+/Project/nbproject/
 /Project/build/
-/Project/dist/
+/Project/dist/**
+/Project/test/
