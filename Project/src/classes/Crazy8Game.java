@@ -2,7 +2,6 @@ package classes;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import project.GameModel;
 
 public class Crazy8Game{
 

@@ -1,4 +1,4 @@
-package project;
+package classes;
 
 import classes.BadPlayer;
 import classes.Card;

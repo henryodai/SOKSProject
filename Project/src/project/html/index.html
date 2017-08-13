@@ -11,29 +11,131 @@ and open the template in the editor.
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script type="text/javascript" src="jQuery.js" ></script>
         <script>
+            var isrunning = true;
+            
             $(function(){
+                $("#accept").on("click", startGame);
+                $("#restart").on("click", restart);
+            });
+            
+            function startGame()
+            {
+                isrunning = true;
+                $("#update").off("click").on("click", update);
+                $(".handcontainer").html("");
+                $("#deck").html("");
+                $("#discard").html("");
+                $("#modalform").hide();
+                $(".modaloverlay").hide();
+                app.makeGame($("input[name='game_option']:checked").val());
                 makeCards(app.getPlayers());
                 makePiles(app.getStatus());
-                //$("#update").on("click", function(){
-                //    const isRunning = app.update();
-                //    makeCards(app.getPlayers());
-                //    makePiles(app.getStatus());
-                //});
-            });
+            }
+            
+            function restart()
+            {
+                //Allow game's restart
+                $("#modalform").show();
+                $(".modaloverlay").show();
+            }
+            
+            function update()
+            {
+                if (!isrunning)
+                {
+                    return;
+                }
+                isrunning = app.update();
+                const JsonStatus = app.getStatus();
+                const status = JSON.parse(JsonStatus);
+                //get the current player
+                const currentPlayer = $(".current");
+                //check if the discard pile changed
+                if ($("#discardpile #"+ status.discard.rank + "_of_" + 
+                        status.discard.suit).length === 0)
+                {
+                    //Get the played card
+                    const card = $("#"+ status.discard.rank + "_of_" + status.discard.suit);
+                    //Log the action
+                    $("#consolearea").val($("#consolearea").val() + "\n" + 
+                            currentPlayer.attr("id") + " played the " + 
+                            status.discard.rank + " of " + status.discard.suit);
+                    //Animate the card
+                    const discard = $("#discardpile img").offset();
+                    const offset = card.offset();
+                    card.css({
+                        "transform" : "none",
+                        "position": "fixed",
+                        "top" : offset.top,
+                        "left" : offset.left,
+                        "z-index" : "3"
+                    }).appendTo($("body")).animate({
+                        "top" : discard.top,
+                        "left" : discard.left
+                    }, 600, function(){
+                        makeCards(app.getPlayers());
+                        makePiles(JsonStatus);
+                        $(card).remove();
+                    });
+                }
+                //Check if the deck changed
+                else if ($("#deck #"+ status.deck.rank + "_of_" + 
+                        status.deck.suit).length === 0)
+                {
+                    //Get the played card
+                    const card = $("#"+ status.deck.rank + "_of_" + status.deck.suit);
+                    //Log the action
+                    $("#consolearea").val($("#consolearea").val() + "\n" + 
+                            currentPlayer.attr("id") + " drew the " + 
+                            status.discard.rank + " of " + status.discard.suit);
+                    //Animate the card
+                    const hand = currentPlayer.offset();
+                    const offset = card.offset();
+                    card.css({
+                        "transform" : "none",
+                        "position": "fixed",
+                        "top" : card.top,
+                        "left" : card.left,
+                        "z-index" : "3"
+                    }).appendTo($("body")).animate({
+                        "top" : currentPlayer.top + currentPlayer.height() / 2,
+                        "left" : currentPlayer.left + currentPlayer.width() / 2
+                    }, 600, function(){
+                        makeCards(app.getPlayers());
+                        makePiles(JsonStatus);
+                        $(card).remove();
+                    });
+                }
+                //Check if someone won
+                if (!isrunning)
+                {
+                    //Log the action
+                    $("#consolearea").val($("#consolearea").val() + "\n" + 
+                            currentPlayer.attr("id") + " won!");
+                    $("#consolearea").val($("#consolearea").val() + "\n" + 
+                            "--------------------------------------------");
+                    //set final values
+                    makeCards(app.getPlayers());
+                    makePiles(JsonStatus);
+                }
+            }
             
             function makePiles(cardJson){
                 const json = JSON.parse(cardJson);
                 $("#discardpile").html("")
                     .append("<h2>Discard pile</h2>")
                     .append("<img src='../images/" + 
-                    json.discard.image + "' class='pileimage'/>");
+                    json.discard.image + "' class='pileimage'" + 
+                    "id='"+ json.discard.rank + "_of_" + json.discard.suit + "'/>");
                 $("#deck").html("")
                     .append("<h2>Card pile</h2>")
                     .append("<img src='../images/" + 
-                    json.deck.image + "' class='pileimage' />");
+                    json.deck.image + "' class='pileimage' " + 
+                    "id='"+ json.deck.rank + "_of_" + json.deck.suit + "'/>");
             }
             
             function makeCards(cardJson){
+                $(".playerhand").removeClass("leader").removeClass("current");
                 const json = JSON.parse(cardJson);
                 let i = 1;
                 json.players.forEach(function(player) {
@@ -55,7 +157,8 @@ and open the template in the editor.
                         playerdiv.find(".handcontainer")
                             .append("<li><img src='../images/" + 
                             card.image + "' class='cardimage' style='transform:rotate(" + 
-                            angle + "deg) translate("+translate1+"em, "+translate2+"em)' /></li>");
+                            angle + "deg) translate("+translate1+"em, "+translate2+"em)' " + 
+                            "id='"+ card.rank + "_of_" + card.suit + "'/></li>");
                         angle -= 50 / (player.cards.length - 1);
                         translate1 -= 24.0 / (player.cards.length - 1);
                         if (j < (player.cards.length - 1) / 2)
@@ -257,6 +360,46 @@ and open the template in the editor.
                 height: 100%;
                 text-align: center;
             }
+            
+            .modaloverlay{
+                background-color: #999999;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 4;
+                opacity: 0.4;
+            }
+            
+            #modalform{
+                z-index: 5;
+                width: 500px;
+                height: 250px;
+                position: fixed;
+                top: calc(50% - 125px);
+                left: calc(50% - 415px);
+                background-color: #ffffff;
+                border: #243119 solid 2px;
+                box-shadow: 0px 0px 5px #243119;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .title h2 {
+                color: black;
+                margin: 0;
+                padding: 20px;
+            }
+
+            .title {
+                text-align:  center;
+                height: 60px;
+            }
+
+            .options ul {
+                list-style: none;
+            }
         </style>
     </head>
     <body>
@@ -300,7 +443,25 @@ and open the template in the editor.
             </div>
             <div class="commands">
                 <a href="#" id="update" class="btn">Play</a>
-                <a href="#" class="btn" onclick="app.exit()">Exit the Application</a>
+                <a href="#" id="restart" class="btn">Restart</a>
+                <a href="#" class="btn" onclick="app.exit()">Quit</a>
+            </div>
+        </div>
+        <div class="modaloverlay"></div>
+        <div id="modalform">
+            <div class="title">
+                <h2>Game options</h2>
+            </div>
+            <div class="options">
+                <ul>
+                    <li><input type="radio" name="game_option" value="2"> 2 player random game</li>
+                    <li><input type="radio" name="game_option" value="3"> 3 player random game</li>
+                    <li><input type="radio" name="game_option" value="4"> 4 player random game</li>
+                </ul>
+            </div>
+            <div class="commands">
+                <a href="#" id="accept" class="btn">Start game</a>
+                <a href="#" class="btn" onclick="app.exit()">Quit</a>
             </div>
         </div>
     </body>
